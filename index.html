@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Spotify Challenge</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="css/app.css" type="text/css" />
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.min.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body>
+<div ng-app="myApp" ng-controller="myCtrl">
+
+    <form name="songForm">
+
+        <!--allows users to enter search terms-->
+        <div class="form-group srch" ng-class="{ 'has-error' : songForm.search.$error.minlength && !songForm.search.$pristine }">
+
+            <input name="search" ng-model="track" ng-minlength=3 class="form-control" placeholder="Spotify, find me some albums.." required />
+
+        </div>
+
+        <!--allows users to set filters on album searches only-->
+        <div class="form-group srch filters">
+
+
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" name="newFilter" ng-model="newFilter" value="false" title="Album released in the last two weeks"> New: Released within the last 2 weeks
+                </label>
+            </div>
+
+            <div class="checkbox-inline">
+                <label>
+                    <input type="checkbox" name="hipFilter" ng-model="hipFilter" value="false" title="Albums with the lowest 10% popularity"> Hipster: Lowest 10% popularity
+                </label>
+            </div>
+
+        </div>
+
+        <!--invalidates the form if fewer than 3 letters are entered-->
+        <input type="submit" ng-disabled="songForm.search.$invalid" ng-click="getResults()" class="invisible"/>
+
+    </form>
+
+    <div class="container-fixed">
+
+        <div class="row">
+            <div class="col-sm-12">
+
+                <!--outside the repeat-->
+                <div class="panel-group" id="accordion">
+
+                    <!--repeatable panel visible + invisible-->
+                    <div class="panel panel-default" ng-repeat="n in albumData" title="Popularity: {{n.popularity}}%">
+
+                        <!--use the index of the returned song list-->
+                        <!--executable container-->
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{$index}}">
+
+                            <!--always visible container-->
+                            <div class="panel-heading">
+
+                                <div class="panel-title row">
+
+                                    <!--layout: artist, album name, and song name-->
+                                    <div class="col-sm-1 qheader">
+
+                                        <svg width="28" height="22">
+                                            <rect width="4" height="22" fill="#85BB22" style="opacity:1" />
+                                            <rect width="22" height="22" x="7" y="0" fill="#85BB22" style="opacity:0.{{n.popularity}}" />
+                                        </svg>
+
+                                    </div>
+                                    <div class="col-sm-5 qheader">{{n.artists[0].name}}</div>
+                                    <div class="col-sm-6 qheader">{{n.name}}</div>
+
+                                </div>
+
+                            </div>
+                            <!--end always visible container-->
+
+                        </a>
+
+                        <!--optionally visible container -->
+                        <!--use the index of the returned song list-->
+                        <div id="collapse{{$index}}" class="panel-collapse collapse">
+
+                            <div class="panel-body row">
+
+                                <!--layout: cover + lyrics-->
+                                <div class="col-sm-4"><img class="img-responsive" src="{{n.images[1].url}}" /></div>
+                                <div class="col-sm-8">
+
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Title</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="i in n.tracks.items | orderBy : 'track_number'" ng-class="i.preview_url == currentSong ? 'playing' : ''" ng-click="play(i.preview_url)">
+                                                <td>{{i.track_number}}</td>
+                                                <td>{{i.name}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+
+                            </div>
+                            <!--end optionally visible container-->
+
+                        </div>
+                        <!--end of optionally visible container-->
+
+                    </div>
+                    <!--end of repeatable song panel    -->
+
+                <!--end of accordian group, end of content    -->
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>
